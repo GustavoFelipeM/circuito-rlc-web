@@ -5,11 +5,20 @@ let dadosGlobais = [];
 function simularCircuito(R, L, C, V_in) {
     let pontos = [];
     const totalPontos = 10000;
+    // Frequência e atenuação para descobrir a velocidade do circuito
+    const omega_0 = 1 / Math.sqrt(L * C);
+    const alpha = R / (2 * L);
+    // Ajusta a janela de tempo com base na velocidade do circuito.
+    let tempoTotal = 50 / Math.max(alpha, omega_0, 0.1);
+    // Limite de segurança entre 0.1 milissegundos e 5 segundos
+    tempoTotal = Math.max(0.0001, Math.min(tempoTotal, 5));
     let t = 0; // tempo inicial
     let q = 0; // carga inicial
     let i = 0; // corrente inicial
-    // Janela de tempo de 0.5s dividida pelo total de amostras
-    const dt = 0.5 / totalPontos;
+    const dt = tempoTotal / totalPontos;
+    const dqdt = (corrente) => corrente;
+    // A variação da corrente (di/dt) vem da Lei de Kirchhoff das Malhas
+    const didt = (carga, corrente) => (V_in - (R * corrente) - (carga / C)) / L;
     for (let k = 0; k < totalPontos; k++) {
         let v_cap = q / C;
         pontos.push({
@@ -18,20 +27,65 @@ function simularCircuito(R, L, C, V_in) {
             corrente: i,
             tensao: v_cap
         });
-        // Isolação do termo di/dt da equação diferencial do RLC em série
-        let didt = (V_in - (R * i) - v_cap) / L;
-        // Atualização das variáveis pelo passo de tempo (Aproximação de Euler)
-        q = q + (i * dt);
-        i = i + (didt * dt);
+        //ALGORITMO RK4//
+        // k1: inclinação no início do intervalo
+        let k1_q = dqdt(i);
+        let k1_i = didt(q, i);
+        // k2: inclinação no ponto médio (usando a previsão de k1)
+        let k2_q = dqdt(i + 0.5 * dt * k1_i);
+        let k2_i = didt(q + 0.5 * dt * k1_q, i + 0.5 * dt * k1_i);
+        // k3: inclinação no ponto médio (usando a previsão refinada de k2)
+        let k3_q = dqdt(i + 0.5 * dt * k2_i);
+        let k3_i = didt(q + 0.5 * dt * k2_q, i + 0.5 * dt * k2_i);
+        // k4: inclinação no final do intervalo (usando k3)
+        let k4_q = dqdt(i + dt * k3_i);
+        let k4_i = didt(q + dt * k3_q, i + dt * k3_i);
+        // Atualização das variáveis pela média ponderada das inclinações de Runge-Kutta
+        q = q + (dt / 6) * (k1_q + 2 * k2_q + 2 * k3_q + k4_q);
+        i = i + (dt / 6) * (k1_i + 2 * k2_i + 2 * k3_i + k4_i);
+        // Avança o tempo
         t = t + dt;
     }
     return pontos;
 }
+// Função que converte valores para unidades padrões
+function obterValorComUnidade(idInput, idSelect) {
+    const valor = parseFloat(document.getElementById(idInput).value);
+    const multiplicador = parseFloat(document.getElementById(idSelect).value);
+    return valor * multiplicador;
+}
+// Calcula e exibe os dados teóricos no Dashboard
+function atualizarDashboard(R, L, C) {
+    // Fórmulas teóricas do circuito RLC série
+    const alpha = R / (2 * L);
+    const omega_0 = 1 / Math.sqrt(L * C);
+    const f_0 = omega_0 / (2 * Math.PI);
+    let tipoAmortecimento = "";
+    // Usamos uma pequena margem de tolerância para o criticamente amortecido devido a imprecisões de ponto flutuante
+    if (Math.abs(alpha - omega_0) < 0.001 * omega_0) {
+        tipoAmortecimento = "Crítico";
+        document.getElementById('out-tipo').style.color = "#d39e00";
+    }
+    else if (alpha > omega_0) {
+        tipoAmortecimento = "Superamortecido";
+        document.getElementById('out-tipo').style.color = "#dc3545";
+    }
+    else {
+        tipoAmortecimento = "Subamortecido";
+        document.getElementById('out-tipo').style.color = "#28a745";
+    }
+    // Atualiza o DOM formatando para 2 casas decimais ou notação exponencial se muito grande
+    document.getElementById('out-tipo').innerText = tipoAmortecimento;
+    document.getElementById('out-alpha').innerText = alpha > 10000 ? alpha.toExponential(2) : alpha.toFixed(2);
+    document.getElementById('out-omega').innerText = omega_0 > 10000 ? omega_0.toExponential(2) : omega_0.toFixed(2);
+    document.getElementById('out-f0').innerText = f_0 > 10000 ? f_0.toExponential(2) : f_0.toFixed(2);
+}
 function executarSimulacao() {
-    const R = parseFloat(document.getElementById('resistencia').value);
-    const L = parseFloat(document.getElementById('indutancia').value);
-    const C = parseFloat(document.getElementById('capacitancia').value);
-    const V_in = parseFloat(document.getElementById('tensao').value);
+    const R = obterValorComUnidade('resistencia', 'unidade-resistencia');
+    const L = obterValorComUnidade('indutancia', 'unidade-indutancia');
+    const C = obterValorComUnidade('capacitancia', 'unidade-capacitancia');
+    const V_in = obterValorComUnidade('tensao', 'unidade-tensao');
+    atualizarDashboard(R, L, C);
     const dados = simularCircuito(R, L, C, V_in);
     dadosGlobais = dados; // Salva no escopo global para permitir a exportação do CSV
     console.log(dados);

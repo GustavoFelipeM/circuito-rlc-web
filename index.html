@@ -8,14 +8,33 @@
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f9; color: #333; }
         .container { max-width: 900px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .controles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        label { font-weight: bold; display: block; margin-bottom: 5px; }
-        input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        
+        .controles { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        label { font-weight: bold; display: block; margin-bottom: 5px; font-size: 14px; }
+        
+        .input-group { display: flex; }
+        .input-group input { width: 60%; padding: 8px; border: 1px solid #ccc; border-radius: 4px 0 0 4px; box-sizing: border-box; }
+        .input-group select { width: 40%; padding: 8px; border: 1px solid #ccc; border-left: none; border-radius: 0 4px 4px 0; background-color: #eee; cursor: pointer; }
+        
         button { background-color: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold; }
         button:hover { background-color: #0056b3; }
         .btn-export { background-color: #28a745; margin-left: 10px; }
         .btn-export:hover { background-color: #218838; }
+        
+        /* Estilo do Dashboard */
+        .dashboard { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; padding: 15px; background-color: #e9ecef; border-radius: 6px; }
+        .card { flex: 1; min-width: 150px; background: white; padding: 10px; border-radius: 4px; border-left: 4px solid #007bff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); font-size: 14px;}
+        .card strong { display: block; font-size: 12px; color: #666; text-transform: uppercase; margin-bottom: 5px; }
+        .card span { font-size: 18px; font-weight: bold; color: #333; }
+
         .canvas-container { margin-top: 30px; position: relative; height: 400px; }
+
+        /* Estilo do Rodapé e Easter Egg */
+        .rodape { margin-top: 40px; text-align: center; font-size: 14px; color: #666; border-top: 1px solid #ddd; padding-top: 15px; }
+        .autor { font-weight: bold; cursor: pointer; color: #007bff; transition: color 0.2s; user-select: none; }
+        .autor:hover { color: #0056b3; }
+        .equipe-secundaria { max-height: 0; overflow: hidden; opacity: 0; transition: all 0.5s ease; font-size: 12px; color: #999; }
+        .equipe-secundaria.visivel { max-height: 50px; opacity: 1; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -26,28 +45,69 @@
     
     <div class="controles">
         <div>
-            <label for="resistencia">Resistência (R - Ω):</label>
-            <input type="number" id="resistencia" value="10" step="0.1">
+            <label for="resistencia">Resistência (R):</label>
+            <div class="input-group">
+                <input type="number" id="resistencia" value="10" step="0.1">
+                <select id="unidade-resistencia">
+                    <option value="1">Ω</option>
+                    <option value="1e3">kΩ</option>
+                    <option value="1e6">MΩ</option>
+                </select>
+            </div>
         </div>
         <div>
-            <label for="indutancia">Indutância (L - H):</label>
-            <input type="number" id="indutancia" value="0.1" step="0.01">
+            <label for="indutancia">Indutância (L):</label>
+            <div class="input-group">
+                <input type="number" id="indutancia" value="100" step="1">
+                <select id="unidade-indutancia">
+                    <option value="1">H</option>
+                    <option value="1e-3" selected>mH</option>
+                    <option value="1e-6">µH</option>
+                </select>
+            </div>
         </div>
         <div>
-            <label for="capacitancia">Capacitância (C - F):</label>
-            <input type="number" id="capacitancia" value="0.001" step="0.0001">
+            <label for="capacitancia">Capacitância (C):</label>
+            <div class="input-group">
+                <input type="number" id="capacitancia" value="100" step="1">
+                <select id="unidade-capacitancia">
+                    <option value="1">F</option>
+                    <option value="1e-3">mF</option>
+                    <option value="1e-6" selected>µF</option>
+                    <option value="1e-9">nF</option>
+                </select>
+            </div>
         </div>
         <div>
             <label for="tensao">Tensão Fonte (V_in):</label>
-            <input type="number" id="tensao" value="5" step="0.5">
+            <div class="input-group">
+                <input type="number" id="tensao" value="5" step="0.5">
+                <select id="unidade-tensao">
+                    <option value="1">V</option>
+                </select>
+            </div>
         </div>
     </div>
 
     <button id="btnCalcular">Simular Circuito</button>
     <button id="btnExportar" class="btn-export">Exportar CSV</button>
 
+    <div class="dashboard">
+        <div class="card"><strong>Amortecimento</strong> <span id="out-tipo">-</span></div>
+        <div class="card"><strong>Fator α (Atenuação)</strong> <span id="out-alpha">-</span> <small>rad/s</small></div>
+        <div class="card"><strong>Frequência ω₀</strong> <span id="out-omega">-</span> <small>rad/s</small></div>
+        <div class="card"><strong>Frequência f₀</strong> <span id="out-f0">-</span> <small>Hz</small></div>
+    </div>
+
     <div class="canvas-container">
         <canvas id="graficoRLC"></canvas>
+    </div>
+
+    <div class="rodape">
+        Desenvolvido por <span class="autor" onclick="document.getElementById('resto-da-equipe').classList.toggle('visivel')" title="Clique aqui!">Gustavo Felipe</span>
+        <div id="resto-da-equipe" class="equipe-secundaria">
+            Equipe: Lucas Carvalho, Laura de Lima e Giovanna Costa
+        </div>
     </div>
 </div>
 
