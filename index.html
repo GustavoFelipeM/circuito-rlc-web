@@ -5,37 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simulador de Circuito RLC</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f9; color: #333; }
-        .container { max-width: 900px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        
-        .controles { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        label { font-weight: bold; display: block; margin-bottom: 5px; font-size: 14px; }
-        
-        .input-group { display: flex; }
-        .input-group input { width: 60%; padding: 8px; border: 1px solid #ccc; border-radius: 4px 0 0 4px; box-sizing: border-box; }
-        .input-group select { width: 40%; padding: 8px; border: 1px solid #ccc; border-left: none; border-radius: 0 4px 4px 0; background-color: #eee; cursor: pointer; }
-        
-        button { background-color: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold; }
-        button:hover { background-color: #0056b3; }
-        .btn-export { background-color: #28a745; margin-left: 10px; }
-        .btn-export:hover { background-color: #218838; }
-        
-        /* Estilo do Dashboard */
-        .dashboard { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; padding: 15px; background-color: #e9ecef; border-radius: 6px; }
-        .card { flex: 1; min-width: 150px; background: white; padding: 10px; border-radius: 4px; border-left: 4px solid #007bff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); font-size: 14px;}
-        .card strong { display: block; font-size: 12px; color: #666; text-transform: uppercase; margin-bottom: 5px; }
-        .card span { font-size: 18px; font-weight: bold; color: #333; }
-
-        .canvas-container { margin-top: 30px; position: relative; height: 400px; }
-
-        /* Estilo do Rodapé e Easter Egg */
-        .rodape { margin-top: 40px; text-align: center; font-size: 14px; color: #666; border-top: 1px solid #ddd; padding-top: 15px; }
-        .autor { font-weight: bold; cursor: pointer; color: #007bff; transition: color 0.2s; user-select: none; }
-        .autor:hover { color: #0056b3; }
-        .equipe-secundaria { max-height: 0; overflow: hidden; opacity: 0; transition: all 0.5s ease; font-size: 12px; color: #999; }
-        .equipe-secundaria.visivel { max-height: 50px; opacity: 1; margin-top: 10px; }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -78,19 +48,53 @@
                 </select>
             </div>
         </div>
-        <div>
-            <label for="tensao">Tensão Fonte (V_in):</label>
-            <div class="input-group">
-                <input type="number" id="tensao" value="5" step="0.5">
-                <select id="unidade-tensao">
-                    <option value="1">V</option>
-                </select>
+
+        <div class="fonte-container">
+            <label>Fonte de Tensão V(t):</label>
+            <div class="accordion-header" id="btnAlternarFonte">
+                <span>⚙️ Configurar Fonte</span>
+                <span class="accordion-icon" id="seta-accordion">▼</span>
+            </div>
+        </div>
+
+        <div class="panel-fonte-expandido" id="conteudoFonte">
+            <div class="panel-grid">
+                <div>
+                    <label for="amplitude_a">Amplitude (A):</label>
+                    <div class="input-group">
+                        <input type="number" id="amplitude_a" value="5" step="0.5">
+                        <select id="unidade-amplitude">
+                            <option value="1">V</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label for="omega_fonte">Frequência Angular (ω):</label>
+                    <div class="input-group">
+                        <input type="number" id="omega_fonte" value="377" step="1">
+                        <select id="unidade-omega">
+                            <option value="1">rad/s</option>
+                            <option value="1e3">krad/s</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label for="offset_b">Offset Contínuo (B):</label>
+                    <div class="input-group">
+                        <input type="number" id="offset_b" value="0" step="0.5">
+                        <select id="unidade-offset">
+                            <option value="1">V</option>
+                        </select>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <button id="btnCalcular">Simular Circuito</button>
-    <button id="btnExportar" class="btn-export">Exportar CSV</button>
+    <div class="acoes">
+        <button id="btnCalcular">Simular Circuito</button>
+        <button id="btnExportar" class="btn-export">Exportar CSV</button>
+    </div>
 
     <div class="dashboard">
         <div class="card"><strong>Amortecimento</strong> <span id="out-tipo">-</span></div>

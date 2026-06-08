@@ -1,0 +1,198 @@
+body { 
+    font-family: Arial, sans-serif; 
+    margin: 20px; 
+    background-color: #f4f4f9; 
+    color: #333; 
+}
+.container { 
+    max-width: 1000px; 
+    margin: 0 auto; 
+    background: white; 
+    padding: 20px; 
+    border-radius: 8px; 
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+}
+
+/* Grid principal responsivo */
+.controles { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
+    gap: 15px; 
+    margin-bottom: 20px;
+    align-items: end;
+}
+
+label { 
+    font-weight: bold; 
+    display: block; 
+    margin-bottom: 5px; 
+    font-size: 14px; 
+}
+
+.input-group { 
+    display: flex; 
+}
+.input-group input { 
+    width: 60%; 
+    padding: 8px; 
+    border: 1px solid #ccc; 
+    border-radius: 4px 0 0 4px; 
+    box-sizing: border-box; 
+}
+.input-group select { 
+    width: 40%; 
+    padding: 8px; 
+    border: 1px solid #ccc; 
+    border-left: none; 
+    border-radius: 0 4px 4px 0; 
+    background-color: #eee; 
+    cursor: pointer; 
+}
+
+/* Container da fonte para isolar o comportamento */
+.fonte-container {
+    position: relative;
+}
+
+.accordion-header {
+    background-color: #e9ecef;
+    padding: 8px 15px;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    height: 38px;
+    box-sizing: border-box;
+    transition: background-color 0.2s;
+}
+
+.accordion-header:hover {
+    background-color: #dee2e6;
+}
+
+.accordion-icon {
+    transition: transform 0.3s ease;
+    font-size: 11px;
+    color: #666;
+}
+
+/* Painel expandido que ocupa a largura total logo abaixo dos controles */
+.panel-fonte-expandido {
+    grid-column: 1 / -1;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    margin-top: 5px;
+    display: none; 
+}
+
+.panel-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    width: 100%;
+}
+
+/* Botões de Ação */
+.acoes { 
+    margin: 20px 0; 
+    display: flex; 
+    gap: 10px; 
+}
+button { 
+    background-color: #007bff; 
+    color: white; 
+    border: none; 
+    padding: 10px 20px; 
+    border-radius: 4px; 
+    cursor: pointer; 
+    font-size: 16px; 
+    font-weight: bold; 
+}
+button:hover { 
+    background-color: #0056b3; 
+}
+.btn-export { 
+    background-color: #28a745; 
+}
+.btn-export:hover { 
+    background-color: #218838; 
+}
+
+/* Dashboard */
+.dashboard { 
+    display: flex; 
+    flex-wrap: wrap; 
+    gap: 10px; 
+    margin-top: 20px; 
+    padding: 15px; 
+    background-color: #e9ecef; 
+    border-radius: 6px; 
+}
+.card { 
+    flex: 1; 
+    min-width: 180px; 
+    background: white; 
+    padding: 10px; 
+    border-radius: 4px; 
+    border-left: 4px solid #007bff; 
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+    font-size: 14px;
+}
+.card strong { 
+    display: block; 
+    font-size: 12px; 
+    color: #666; 
+    text-transform: uppercase; 
+    margin-bottom: 5px; 
+}
+.card span { 
+    font-size: 18px; 
+    font-weight: bold; 
+    color: #333; 
+}
+
+.canvas-container { 
+    margin-top: 30px; 
+    position: relative; 
+    height: 400px; 
+}
+
+/* Rodapé */
+.rodape { 
+    margin-top: 40px; 
+    text-align: center; 
+    font-size: 14px; 
+    color: #666; 
+    border-top: 1px solid #ddd; 
+    padding-top: 15px; 
+}
+.autor { 
+    font-weight: bold; 
+    cursor: pointer; 
+    color: #007bff; 
+    transition: color 0.2s; 
+    user-select: none; 
+}
+.autor:hover { 
+    color: #0056b3; 
+}
+.equipe-secundaria { 
+    max-height: 0; 
+    overflow: hidden; 
+    opacity: 0; 
+    transition: all 0.5s ease; 
+    font-size: 12px; 
+    color: #999; 
+}
+.equipe-secundaria.visivel { 
+    max-height: 50px; 
+    opacity: 1; 
+    margin-top: 10px; 
+}

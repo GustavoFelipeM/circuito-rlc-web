@@ -1,8 +1,8 @@
 // Gerenciamento de estado global da página
 let meuGrafico = null;
 let dadosGlobais = [];
-// Resolução da Equação Diferencial do circuito RLC usando o Método de Euler
-function simularCircuito(R, L, C, V_in) {
+// Resolução da Equação Diferencial do circuito RLC usando o RK4
+function simularCircuito(R, L, C, A, omega_fonte, B) {
     let pontos = [];
     const totalPontos = 10000;
     // Frequência e atenuação para descobrir a velocidade do circuito
@@ -18,7 +18,10 @@ function simularCircuito(R, L, C, V_in) {
     const dt = tempoTotal / totalPontos;
     const dqdt = (corrente) => corrente;
     // A variação da corrente (di/dt) vem da Lei de Kirchhoff das Malhas
-    const didt = (carga, corrente) => (V_in - (R * corrente) - (carga / C)) / L;
+    const didt = (carga, corrente, tempo) => {
+        let V_t = A * Math.sin(omega_fonte * tempo) + B;
+        return (V_t - (R * corrente) - (carga / C)) / L;
+    };
     for (let k = 0; k < totalPontos; k++) {
         let v_cap = q / C;
         pontos.push({
@@ -27,19 +30,19 @@ function simularCircuito(R, L, C, V_in) {
             corrente: i,
             tensao: v_cap
         });
-        //ALGORITMO RK4//
+        // ALGORITMO RK4 //
         // k1: inclinação no início do intervalo
         let k1_q = dqdt(i);
-        let k1_i = didt(q, i);
+        let k1_i = didt(q, i, t);
         // k2: inclinação no ponto médio (usando a previsão de k1)
         let k2_q = dqdt(i + 0.5 * dt * k1_i);
-        let k2_i = didt(q + 0.5 * dt * k1_q, i + 0.5 * dt * k1_i);
+        let k2_i = didt(q + 0.5 * dt * k1_q, i + 0.5 * dt * k1_i, t + 0.5 * dt);
         // k3: inclinação no ponto médio (usando a previsão refinada de k2)
         let k3_q = dqdt(i + 0.5 * dt * k2_i);
-        let k3_i = didt(q + 0.5 * dt * k2_q, i + 0.5 * dt * k2_i);
+        let k3_i = didt(q + 0.5 * dt * k2_q, i + 0.5 * dt * k2_i, t + 0.5 * dt);
         // k4: inclinação no final do intervalo (usando k3)
         let k4_q = dqdt(i + dt * k3_i);
-        let k4_i = didt(q + dt * k3_q, i + dt * k3_i);
+        let k4_i = didt(q + dt * k3_q, i + dt * k3_i, t + dt);
         // Atualização das variáveis pela média ponderada das inclinações de Runge-Kutta
         q = q + (dt / 6) * (k1_q + 2 * k2_q + 2 * k3_q + k4_q);
         i = i + (dt / 6) * (k1_i + 2 * k2_i + 2 * k3_i + k4_i);
@@ -84,9 +87,11 @@ function executarSimulacao() {
     const R = obterValorComUnidade('resistencia', 'unidade-resistencia');
     const L = obterValorComUnidade('indutancia', 'unidade-indutancia');
     const C = obterValorComUnidade('capacitancia', 'unidade-capacitancia');
-    const V_in = obterValorComUnidade('tensao', 'unidade-tensao');
+    const A = obterValorComUnidade('amplitude_a', 'unidade-amplitude');
+    const omega_fonte = obterValorComUnidade('omega_fonte', 'unidade-omega');
+    const B = obterValorComUnidade('offset_b', 'unidade-offset');
     atualizarDashboard(R, L, C);
-    const dados = simularCircuito(R, L, C, V_in);
+    const dados = simularCircuito(R, L, C, A, omega_fonte, B);
     dadosGlobais = dados; // Salva no escopo global para permitir a exportação do CSV
     console.log(dados);
     // Separação dos dados em arrays unidimensionais exigidos pelo Chart.js
@@ -166,11 +171,32 @@ function exportarCSV() {
     link.click();
     document.body.removeChild(link);
 }
+// Inicialização do controle do acordeão com checagem de tipos estritos do TypeScript
+function gerenciarAcordeonFonte() {
+    const botaoFonte = document.getElementById('btnAlternarFonte');
+    const conteudoFonte = document.getElementById('conteudoFonte');
+    const setaFonte = document.getElementById('seta-accordion');
+    if (botaoFonte && conteudoFonte && setaFonte) {
+        botaoFonte.addEventListener('click', () => {
+            if (conteudoFonte.style.display === 'none' || conteudoFonte.style.display === '') {
+                conteudoFonte.style.display = 'block';
+                setaFonte.style.transform = 'rotate(180deg)';
+                botaoFonte.style.backgroundColor = '#dee2e6';
+            }
+            else {
+                conteudoFonte.style.display = 'none';
+                setaFonte.style.transform = 'rotate(0deg)';
+                botaoFonte.style.backgroundColor = '#e9ecef';
+            }
+        });
+    }
+}
 // Vinculação dos eventos de botões e ciclo de vida da página
 document.getElementById('btnCalcular')?.addEventListener('click', executarSimulacao);
 document.getElementById('btnExportar')?.addEventListener('click', exportarCSV);
-// Executa uma simulação prévia assim que o DOM estiver pronto
+// Executa os scripts e uma simulação prévia assim que o DOM estiver pronto
 window.addEventListener('DOMContentLoaded', () => {
+    gerenciarAcordeonFonte();
     executarSimulacao();
 });
 export {};
