@@ -196,3 +196,83 @@ button:hover {
     opacity: 1; 
     margin-top: 10px; 
 }
+/* =====================================================================
+   ESTILIZAÇÃO DO TOGGLE SWITCH (FONTE AC/DC)
+   ===================================================================== */
+.toggle-switch-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 38px; /* Mesma altura dos inputs para manter o alinhamento */
+    box-sizing: border-box;
+}
+
+/* O container do switch */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 54px;
+    height: 28px;
+}
+
+/* Esconde o checkbox padrão do navegador */
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* O slider visual do switch */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #007bff; /* Cor quando selecionado em DC */
+    transition: 0.3s ease;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: 0.3s ease;
+}
+
+/* Quando marcado (Ativado = AC), muda a cor do fundo */
+input:checked + .slider {
+    background-color: #28a745; 
+}
+
+/* Move a bolinha branca para a direita quando ativado */
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+/* Arredondamento do Switch */
+.slider.round {
+    border-radius: 34px;
+}
+.slider.round:before {
+    border-radius: 50%;
+}
+
+/* Labels do Switch */
+.toggle-label {
+    font-weight: bold;
+    font-size: 14px;
+    user-select: none;
+}
+.mode-dc { color: #007bff; }
+.mode-ac { color: #28a745; }
+
+/* Grid do painel DC para manter o tamanho padrão dos outros inputs */
+.panel-grid-dc {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 250px)); /* Limita a largura máxima do input */
+    gap: 15px;
+    width: 100%;
+}

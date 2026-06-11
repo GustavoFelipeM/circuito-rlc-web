@@ -51,42 +51,60 @@
         </div>
 
         <div class="fonte-container">
-            <label>Fonte de Tensão V(t):</label>
-            <div class="accordion-header" id="btnAlternarFonte">
-                <span>⚙️ Configurar Fonte</span>
-                <span class="accordion-icon" id="seta-accordion">▼</span>
+            <label>Tipo de Fonte de Tensão:</label>
+            <div class="toggle-switch-wrapper">
+                <span class="toggle-label mode-dc">DC</span>
+                <label class="switch">
+                    <input type="checkbox" id="switch-fonte">
+                    <span class="slider round"></span>
+                </label>
+                <span class="toggle-label mode-ac">AC</span>
             </div>
         </div>
+    </div>
 
-        <div class="panel-fonte-expandido" id="conteudoFonte">
-            <div class="panel-grid">
-                <div>
-                    <label for="amplitude_a">Amplitude (A):</label>
-                    <div class="input-group">
-                        <input type="number" id="amplitude_a" value="5" step="0.5">
-                        <select id="unidade-amplitude">
-                            <option value="1">V</option>
-                        </select>
-                    </div>
+    <div class="panel-fonte-expandido" id="painel-dc" style="display: block;">
+        <div class="panel-grid-dc">
+            <div>
+                <label for="tensao_dc">Tensão Contínua (V_dc):</label>
+                <div class="input-group">
+                    <input type="number" id="tensao_dc" value="12" step="0.5">
+                    <select id="unidade-tensao-dc">
+                        <option value="1">V</option>
+                    </select>
                 </div>
-                <div>
-                    <label for="omega_fonte">Frequência Angular (ω):</label>
-                    <div class="input-group">
-                        <input type="number" id="omega_fonte" value="377" step="1">
-                        <select id="unidade-omega">
-                            <option value="1">rad/s</option>
-                            <option value="1e3">krad/s</option>
-                        </select>
-                    </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-fonte-expandido" id="painel-ac" style="display: none;">
+        <div class="panel-grid">
+            <div>
+                <label for="amplitude_a">Amplitude (A):</label>
+                <div class="input-group">
+                    <input type="number" id="amplitude_a" value="5" step="0.5">
+                    <select id="unidade-amplitude">
+                        <option value="1">V</option>
+                    </select>
                 </div>
-                <div>
-                    <label for="offset_b">Offset Contínuo (B):</label>
-                    <div class="input-group">
-                        <input type="number" id="offset_b" value="0" step="0.5">
-                        <select id="unidade-offset">
-                            <option value="1">V</option>
-                        </select>
-                    </div>
+            </div>
+            <div>
+                <label for="freq_fonte">Frequência da Fonte (f):</label>
+                <div class="input-group">
+                    <input type="number" id="freq_fonte" value="60" step="1">
+                    <select id="unidade-frequencia">
+                        <option value="1">Hz</option>
+                        <option value="1e3">kHz</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label for="offset_b">Offset Contínuo (B):</label>
+                <div class="input-group">
+                    <input type="number" id="offset_b" value="0" step="0.5">
+                    <select id="unidade-offset">
+                        <option value="1">V</option>
+                    </select>
                 </div>
             </div>
         </div>
